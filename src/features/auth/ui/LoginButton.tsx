@@ -1,5 +1,5 @@
 import { Button } from '@/shared/ui/Button';
-import { useLogin } from '../model/useLogin';
+import { useLogin } from '@/features/auth';
 
 export function LoginButton() {
   const { login } = useLogin();

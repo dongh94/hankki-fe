@@ -1,14 +1,14 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import { targetState } from '@/entities/target';
-import type { Target } from '@/entities/target';
+import { selectedPlaceState } from '@/entities/selected-place';
+import type { SelectedPlace } from '@/entities/selected-place';
 import { searchPlacesByKeyword } from '@/shared/lib';
 import { css } from '@emotion/react';
 
 const DEFAULT_CENTER = { x: '126.92782828003486', y: '37.5272141878929' };
 
 type Props = {
-  onSelect: (target: Target) => void;
+  onSelect: (selectedPlace: SelectedPlace) => void;
   error: boolean;
   ok: boolean;
   onBlur?: () => void;
@@ -16,9 +16,9 @@ type Props = {
 
 export function RestaurantSearch({ onSelect, error, ok, onBlur }: Props) {
   const [query, setQuery] = useState('');
-  const [list, setList] = useState<Target[]>([]);
+  const [list, setList] = useState<SelectedPlace[]>([]);
   const [active, setActive] = useState(true);
-  const [, setTarget] = useRecoilState(targetState);
+  const [, setSelectedPlace] = useRecoilState(selectedPlaceState);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -47,9 +47,9 @@ export function RestaurantSearch({ onSelect, error, ok, onBlur }: Props) {
         size: 15,
         sort: 'distance',
       });
-      const asTarget = places as unknown as Target[];
-      setList(asTarget);
-      if (asTarget.length === 0) {
+      const asSelectedPlace = places as unknown as SelectedPlace[];
+      setList(asSelectedPlace);
+      if (asSelectedPlace.length === 0) {
         alert('검색 결과가 없습니다.');
         setActive(true);
       } else {
@@ -61,14 +61,14 @@ export function RestaurantSearch({ onSelect, error, ok, onBlur }: Props) {
   }, [query]);
 
   const handleSelect = useCallback(
-    (item: Target) => {
-      setTarget(item);
+    (item: SelectedPlace) => {
+      setSelectedPlace(item);
       onSelect(item);
       setList([]);
       setQuery('');
       setActive(true);
     },
-    [onSelect, setTarget]
+    [onSelect, setSelectedPlace]
   );
 
   return (

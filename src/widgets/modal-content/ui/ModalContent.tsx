@@ -71,8 +71,8 @@ export function ModalContent() {
   const participateRoomId = useRecoilValue(modalParticipateRoomIdState);
 
   const isCreate = location.pathname === '/create';
-  /** 참여하기 모달: Recoil에 저장된 방 ID 사용 (포스트 페이지에서 열 때 설정됨) */
-  const postId = participateRoomId;
+  /** 참여하기 모달: Recoil에 저장된 방 ID 사용 (방 상세 페이지에서 열 때 설정됨) */
+  const roomId = participateRoomId;
   const userId = Number(localStorage.getItem(AUTH_USER_ID_KEY) ?? 0);
 
   const close = () => {
@@ -91,12 +91,12 @@ export function ModalContent() {
     }
   };
 
-  const handlePostSubmit = async () => {
-    if (postId == null) return;
+  const handleParticipateSubmit = async () => {
+    if (roomId == null) return;
     try {
-      await participateInRoom(postId, userId);
-      await queryClient.invalidateQueries({ queryKey: ['room', 'details', postId] });
-      await queryClient.invalidateQueries({ queryKey: ['room', 'users', postId] });
+      await participateInRoom(roomId, userId);
+      await queryClient.invalidateQueries({ queryKey: ['room', 'details', roomId] });
+      await queryClient.invalidateQueries({ queryKey: ['room', 'users', roomId] });
       await queryClient.invalidateQueries({ queryKey: ['rooms'] });
       close();
     } catch (err) {
@@ -123,7 +123,7 @@ export function ModalContent() {
     );
   }
 
-  if (postId != null && postId > 0) {
+  if (roomId != null && roomId > 0) {
     return (
       <>
         <div css={contentStyle}>
@@ -131,7 +131,7 @@ export function ModalContent() {
           <p css={descStyle}>점심 메이트는 한번에 한방만 참여가 가능합니다.</p>
         </div>
         <div css={buttonGroupStyle}>
-          <button type="button" css={submitBtnStyle} onClick={handlePostSubmit}>
+          <button type="button" css={submitBtnStyle} onClick={handleParticipateSubmit}>
             참여할게요
           </button>
           <button type="button" css={resetBtnStyle} onClick={close}>

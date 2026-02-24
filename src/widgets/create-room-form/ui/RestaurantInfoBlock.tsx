@@ -1,5 +1,5 @@
 import { useRecoilValue } from 'recoil';
-import { targetState } from '@/entities/target';
+import { selectedPlaceState } from '@/entities/selected-place';
 import { Label } from '@/shared/ui/Label';
 import { KakaoMap } from '@/widgets/kakao-map';
 
@@ -14,8 +14,8 @@ const blockStyle = {
 };
 
 export function RestaurantInfoBlock() {
-  const target = useRecoilValue(targetState);
-  const hasPlace = target.place_name;
+  const selectedPlace = useRecoilValue(selectedPlaceState);
+  const hasPlace = selectedPlace.place_name;
 
   if (!hasPlace) {
     return (
@@ -26,22 +26,24 @@ export function RestaurantInfoBlock() {
     );
   }
 
-  const lat = Number(target.y);
-  const lng = Number(target.x);
+  const lat = Number(selectedPlace.y);
+  const lng = Number(selectedPlace.x);
 
   return (
     <div style={{ marginTop: 16, marginBottom: 8 }}>
       <div style={{ ...blockStyle, display: 'flex', flexDirection: 'column' }}>
-        <Label tag={target.category_name ?? ''} />
-        <div style={{ fontFamily: 'Pretendard-ExtraBold', fontSize: 32 }}>{target.place_name}</div>
+        <Label tag={selectedPlace.category_name ?? ''} />
+        <div style={{ fontFamily: 'Pretendard-ExtraBold', fontSize: 32 }}>{selectedPlace.place_name}</div>
         <hr style={{ border: '1.5px solid var(--gray-250)', margin: '4px 0' }} />
         <div style={{ display: 'flex', gap: 8 }}>
           <img src="/assets/icon/location_icon.svg" alt="" width={32} height={32} />
-          <span style={{ color: 'var(--gray-450)' }}>{target.road_address_name || target.address_name}</span>
+          <span style={{ color: 'var(--gray-450)' }}>
+            {selectedPlace.road_address_name || selectedPlace.address_name}
+          </span>
         </div>
       </div>
       <div style={{ marginTop: 12 }}>
-        <KakaoMap lat={lat} lng={lng} placeUrl={target.place_url} />
+        <KakaoMap lat={lat} lng={lng} placeUrl={selectedPlace.place_url} />
       </div>
     </div>
   );

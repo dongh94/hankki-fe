@@ -1,11 +1,11 @@
 import { useForm } from '@tanstack/react-form';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { roomDraftState } from '@/entities/room';
-import { targetState } from '@/entities/target';
+import { selectedPlaceState } from '@/entities/selected-place';
 import { modalVisibleState } from '@/features/modal';
 import { setDateString } from '@/shared/lib';
 import { AUTH_USER_ID_KEY } from '@/shared/api';
-import type { Target } from '@/entities/target';
+import type { SelectedPlace } from '@/entities/selected-place';
 import { RestaurantSearch } from './RestaurantSearch';
 import { RestaurantInfoBlock } from './RestaurantInfoBlock';
 import { TimeDropDown } from './TimeDropDown';
@@ -50,7 +50,7 @@ export function CreateRoomForm() {
   const userId = Number(localStorage.getItem(AUTH_USER_ID_KEY) ?? 0);
   const setDraft = useSetRecoilState(roomDraftState);
   const setModalVisible = useSetRecoilState(modalVisibleState);
-  const target = useRecoilValue(targetState);
+  const selectedPlace = useRecoilValue(selectedPlaceState);
 
   const form = useForm<CreateRoomFormValues>({
     defaultValues: {
@@ -60,7 +60,7 @@ export function CreateRoomForm() {
       limitedAttendees: 2,
     },
     onSubmit: async ({ value }) => {
-      if (!target.place_name) return;
+      if (!selectedPlace.place_name) return;
       if (validateFutureTime(value.lunchTime)) return;
       const [h, m] = value.lunchTime.split(':').map(Number);
       setDraft((prev) => ({
@@ -68,12 +68,12 @@ export function CreateRoomForm() {
         userId,
         title: value.title,
         description: value.description,
-        restaurantName: target.place_name,
-        restaurantLocation: target.address_name,
-        restaurantCategory: target.category_name ?? '',
-        restaurantLatitude: Number(target.y) || 0,
-        restaurantLongitude: Number(target.x) || 0,
-        locationUrl: target.place_url,
+        restaurantName: selectedPlace.place_name,
+        restaurantLocation: selectedPlace.address_name,
+        restaurantCategory: selectedPlace.category_name ?? '',
+        restaurantLatitude: Number(selectedPlace.y) || 0,
+        restaurantLongitude: Number(selectedPlace.x) || 0,
+        locationUrl: selectedPlace.place_url,
         lunchTime: setDateString(h, m),
         limitedAttendees: value.limitedAttendees,
       }));
@@ -84,10 +84,10 @@ export function CreateRoomForm() {
   const values = form.useStore((s) => s.values);
   const submissionAttempts = form.useStore((s) => s.submissionAttempts);
 
-  const searchError = !target.place_name && submissionAttempts > 0;
+  const searchError = !selectedPlace.place_name && submissionAttempts > 0;
   const timeError = validateFutureTime(values.lunchTime);
 
-  const handleSelectRestaurant = (t: Target) => {
+  const handleSelectRestaurant = (t: SelectedPlace) => {
     setDraft((prev) => ({
       ...prev,
       restaurantName: t.place_name,
@@ -112,7 +112,7 @@ export function CreateRoomForm() {
           <RestaurantSearch
             onSelect={handleSelectRestaurant}
             error={searchError}
-            ok={!!target.place_name}
+            ok={!!selectedPlace.place_name}
             onBlur={() => {}}
           />
           {searchError && (
